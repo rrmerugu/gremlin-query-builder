@@ -18,9 +18,9 @@ traversal_config = {
 
                 # filter on properties
                 "properties": {
-                    # "code": {
-                    #     "startingWith": "AUS"
-                    # },
+                    "code": {
+                        "startingWith": "AUS"
+                    },
                     "_or": {
                         "code": {
                             "within": ["AUS", "ANC", "MCO"]
@@ -33,11 +33,14 @@ traversal_config = {
                 },
 
                 # paginate
-                # "paginate": {
-                #     "page_size": 20, 
-                #     "page_number": 1
-                # }
-            }
+                "paginate": {
+                    "page_size": 20, 
+                    "page_number": 1
+                }
+            },
+            # "traversals": {
+            #     "oute": 
+            # }
         }
     }
 

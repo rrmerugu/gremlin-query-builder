@@ -60,8 +60,8 @@ def hasValue(*args):
             Exception: _description_
             Exception: _description_
         """
-        if kwargs.keys().__len__() > 0 and list(set([_and, _or, _not])) is None:
-            raise Exception("filter_properties() should have kwargs")
+        if kwargs.keys().__len__() == 0 and _and is None and  _or is None and _not is None:
+            raise Exception("filter_properties() should be used with kwargs or ['_and', '_or', '_not']")
 
         filters = []
         for property_name, property_filter in kwargs.items():

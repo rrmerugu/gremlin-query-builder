@@ -21,6 +21,7 @@ class DriverRemoteConnection(_DriverRemoteConnection):
 
 class GraphSearch:
 
+    # https://github.com/apache/tinkerpop/blob/095718617e0f94f92545e0ac077ca0ab189d6b7f/docs/src/reference/gremlin-variants.asciidoc#domain-specific-languages-4
     #https://github.com/apache/tinkerpop/blob/095718617e0f94f92545e0ac077ca0ab189d6b7f/gremlin-python/src/main/python/gremlin_python/process/graph_traversal.py#L994
     def __init__(self, connection_url, ) -> None:
         self.connection_url = connection_url
@@ -29,8 +30,8 @@ class GraphSearch:
         self.connection = DriverRemoteConnection(
             self.connection_url,  'g',
             graphson_reader=GraphSONReader(deserializer_map=self.deserializer_map),
-
         )
+
         self.g: InvanaTraversal = traversal(traversal_source_class=InvanaTraversalSource) \
                         .withRemote(self.connection)
  
@@ -40,8 +41,9 @@ class GraphSearch:
                 if "filters" in traversal_option:
                     g_ = self.g.V().filter_nodes(**traversal_option['filters'])
 
+        _ = g_.toList()
         # _ = self.g.V().limit(1).outE().toList()
-        _ = g_.outE().limit(10).elementMap().toList()
+        # _ = g_.outE().limit(10).elementMap().toList()
 # 
         self.connection.close()
         return _
