@@ -150,6 +150,7 @@ def hasValue(*args):
         return self
     
     def search_graph(self, **graph_traversal_config: GraphTraversalConfigType):
+        # TODO - search graph
         
         for traversal_type, traversal_option in graph_traversal_config['g'].items():
             if traversal_type == "V":

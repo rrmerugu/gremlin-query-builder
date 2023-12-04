@@ -9,6 +9,7 @@ aiohttp = "3.7.4"
 pyyaml = "*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.12"

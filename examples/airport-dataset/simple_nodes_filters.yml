@@ -1,0 +1,17 @@
+g:
+  V:
+    filters:
+      labels:
+        - airport
+        - country
+      properties:
+        # code:
+        #   startingWith: AU
+        _or:
+          icao:
+            eq: KTPA
+          code:
+            within: [AUS, ANC, MCO]
+      paginate:
+        page_size: 20
+        page_number: 1
