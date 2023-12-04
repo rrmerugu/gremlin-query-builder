@@ -19,10 +19,7 @@ class NodeFiltersConfigType:
 
 class RelationshipFiltersConfigType:
     labels: typing.List[str]
-    properties: typing.Dict[str, typing.Dict[
-            ValidSearchPredicateTypes,
-            typing.Union[str, int, float, typing.List[int], typing.List[str] ]]
-        ]
+    properties: PropertyFilterType
     
 
 class NodeTraversalType:

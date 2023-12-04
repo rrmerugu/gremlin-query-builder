@@ -10,6 +10,7 @@ from .type_defs import GraphTraversalConfigType, NodeFiltersConfigType
 from .traversals import  InvanaTraversalSource, InvanaTraversal, __
 from .graphson_reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
+from gremlin_python import __version__
 
 
 class DriverRemoteConnection(_DriverRemoteConnection):
@@ -34,17 +35,25 @@ class GraphSearch:
 
         self.g: InvanaTraversal = traversal(traversal_source_class=InvanaTraversalSource) \
                         .withRemote(self.connection)
+        print(f"Graphsearch is using gremlinpython=={__version__.version}")
  
-    def search_graph(self, traversal_config: GraphTraversalConfigType):
-        for traversal_type, traversal_option in traversal_config['g'].items():
-            if traversal_type == "V":
-                if "filters" in traversal_option:
-                    g_ = self.g.V().filter_nodes(**traversal_option['filters'])
+    def search_graph(self, graph_traversal_config: GraphTraversalConfigType):
+        # graph = self.g
+        # for traversal_type, traversal_option in graph_traversal_config['g'].items():
+        #     if traversal_type == "V":
+        #         if "filters" in traversal_option:
+        #             graph.V().filter_nodes(**traversal_option['filters'])
+        #         if "traversals" in traversal_option:
+        #             # TODO - detect outE based on the starting key 
+        #             # TODO - write a traverse method on Traversals cls 
+        #             for traversal_type, traversal_config in traversal_option['traversals'].items():
+        #                 if traversal_type == "out_e":
+        #                     if "filters" in traversal_config:
+        #                         graph.V().outE().filter_edges(**traversal_config['filters'])
 
-        _ = g_.toList()
+        # _ = g_.toList()
         # _ = self.g.V().limit(1).outE().toList()
-        # _ = g_.outE().limit(10).elementMap().toList()
-# 
+        _ = self.g.search_graph(**graph_traversal_config).elementMap().toList()
         self.connection.close()
         return _
         # return create_graph_objects(_)

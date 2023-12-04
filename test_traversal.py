@@ -12,12 +12,14 @@ traversal_config = {
                 # "ids": [],
 
                 # filter by has key
+                # filter by has value
 
                 # filter on labels
                 "labels": ["airport", "country"],
 
                 # filter on properties
                 "properties": {
+                    # 
                     "code": {
                         "startingWith": "AUS"
                     },
@@ -32,15 +34,35 @@ traversal_config = {
                     # _and
                 },
 
+                # filter based on relationships and relationships count 
+
+                #
+
                 # paginate
                 "paginate": {
                     "page_size": 20, 
                     "page_number": 1
                 }
             },
-            # "traversals": {
-            #     "oute": 
-            # }
+            "traversals": {
+                # out_e, in_e, both_e, out_v, in_v, both_v, out, in
+                "out_e": {
+                    "filters": {
+                        "labels": ["route"],
+                        # "properties": {
+                        #     "dist": {
+                        #         "between": (700, 900)
+                        #     },
+                        #     "_or": {
+                        #         "dist": {
+                        #             "between": (100, 300)
+                        #         },
+                        #     }
+                        # }
+                    }
+               
+                }
+            }
         }
     }
 
@@ -48,3 +70,4 @@ traversal_config = {
 
 result = search.search_graph(traversal_config)
 print("===result", result)
+print("=====count", result.__len__())
