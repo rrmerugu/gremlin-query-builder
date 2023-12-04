@@ -90,7 +90,7 @@ def hasValue(*args):
                 if getattr(SearchTextPredicate, filter_key):
                     filters.append(__.has(property_name, getattr(TextP, filter_key)(filter_value) ))
                 elif getattr(SearchPredicates, filter_key):
-                    filters.append(__.has(property_name, getattr(P, "filter_key")(filter_value) ))
+                    filters.append(__.has(property_name, getattr(P, filter_key)(filter_value) ))
         
         if filters.__len__() > 0:
             if condition_type == "or":
@@ -157,7 +157,6 @@ def hasValue(*args):
                     self.V().filter_nodes(**traversal_option['filters'])
                 if "traversals" in traversal_option:
                     # TODO - detect outE based on the starting key 
-                    # TODO - write a traverse method on Traversals cls 
                     for traversal_type, traversal_config in traversal_option['traversals'].items():
                         if traversal_type == "out_e":
                             if "filters" in traversal_config:
@@ -223,7 +222,6 @@ class __(AnonymousTraversal):
     @classmethod
     def filter_edges(cls, **kwargs):
         return cls.graph_traversal(None, None, Bytecode()).filter_edges(**kwargs)
-
 
     @classmethod
     def search_graph(cls, **kwargs):

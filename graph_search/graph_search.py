@@ -38,23 +38,8 @@ class GraphSearch:
         print(f"Graphsearch is using gremlinpython=={__version__.version}")
  
     def search_graph(self, graph_traversal_config: GraphTraversalConfigType):
-        # graph = self.g
-        # for traversal_type, traversal_option in graph_traversal_config['g'].items():
-        #     if traversal_type == "V":
-        #         if "filters" in traversal_option:
-        #             graph.V().filter_nodes(**traversal_option['filters'])
-        #         if "traversals" in traversal_option:
-        #             # TODO - detect outE based on the starting key 
-        #             # TODO - write a traverse method on Traversals cls 
-        #             for traversal_type, traversal_config in traversal_option['traversals'].items():
-        #                 if traversal_type == "out_e":
-        #                     if "filters" in traversal_config:
-        #                         graph.V().outE().filter_edges(**traversal_config['filters'])
-
-        # _ = g_.toList()
-        # _ = self.g.V().limit(1).outE().toList()
-        _ = self.g.search_graph(**graph_traversal_config).elementMap().toList()
+        result = self.g.search_graph(**graph_traversal_config).elementMap().toList()
         self.connection.close()
-        return _
+        return result
         # return create_graph_objects(_)
    
