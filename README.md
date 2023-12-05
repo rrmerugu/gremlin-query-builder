@@ -16,6 +16,9 @@ The purpose of this project is to define graph filters and traversals using yaml
 
 ## Usage
 
+
+### Filter by Labels 
+
 ## Learn more
 - https://tinkerpop.apache.org/docs/current/reference/#is-step
 - https://github.com/apache/tinkerpop/blob/master/docs/src/reference/gremlin-variants.asciidoc#the-lambda-solution-3

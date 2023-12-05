@@ -33,7 +33,7 @@ class GraphSearch:
                         .withRemote(self.connection)
  
     def search_graph(self, graph_traversal_config: GraphTraversalConfigType):
-        result = self.graph.search_graph(**graph_traversal_config).elementMap().toList()
+        result = self.graph.search_graph(**graph_traversal_config).toList() 
         self.connection.close()
         return result
    

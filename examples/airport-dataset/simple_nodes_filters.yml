@@ -1,10 +1,10 @@
 g:
   V:
-    filters:
-      labels:
+    filters: # _and, _or, _not 
+      labels: # _and, _or, _not
         - airport
         - country
-      properties:
+      properties: # _and, _or, _not
         # code:
         #   startingWith: AU
         _or:

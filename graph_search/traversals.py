@@ -26,16 +26,18 @@ class InvanaTraversal(GraphTraversal):
 
     # filter by properties 
     def filter_by_labels(self, 
-                         *labels, 
-                         _and: typing.List[str]=None,
-                         _or=typing.List[str], 
-                         _not=typing.List[str] ):
+                        *labels, 
+                        _and: typing.List[str]=None,
+                        _or=typing.List[str], 
+                        _not=typing.List[str],
+                        condition_type: typing.Literal["or", "and", "not",]= "and"):
         if labels.__len__() == 1: # for single label
             self.bytecode.add_step("hasLabel", labels[0])
         else: # fore more than one labels
             args =[__.hasLabel(label) for label in labels]
             self.bytecode.add_step("or", *args)
         # TODO - add logics for _and, _or, _not 
+        return self
 
     def filter_by_properties(self, 
                 _and: PropertyFilterType=None, 
@@ -60,25 +62,15 @@ class InvanaTraversal(GraphTraversal):
             # _and
         }
 
-        """
-
-
-        """
+        #TODO 
+        def hasKey(*args):
+            return __.hasKey(*args)
         
-def hasKey(*args):
-    return __.hasKey(*args)
+        def hasNot(*args):
+            return __.hasNot(*args)
 
-
-def hasLabel(*args):
-    return __.hasLabel(*args)
-
-
-def hasNot(*args):
-    return __.hasNot(*args)
-
-
-def hasValue(*args):
-    return __.hasValue(*args)
+        def hasValue(*args):
+            return __.hasValue(*args)
 
 
 
@@ -122,6 +114,56 @@ def hasValue(*args):
 
         if _not:
             self.filter_by_properties(**_not, condition_type="not")
+    
+        return self
+
+    def filter_by_traversals(self,
+                _and: PropertyFilterType=None, 
+                _or: PropertyFilterType=None, 
+                _not: PropertyFilterType=None,
+                condition_type: typing.Literal["or", "and", "not",]= "and",
+                outE: RelationshipFiltersConfigType =None,
+                inE: RelationshipFiltersConfigType =None,
+                bothE: RelationshipFiltersConfigType =None,
+                inV: NodeFiltersConfigType =None,
+                outV: NodeFiltersConfigType =None,
+                bothV: NodeFiltersConfigType =None,
+                otherV: NodeFiltersConfigType =None ):
+        # TODO - make kwargs to **kwargs
+        traversal_filters = []
+        if outE:
+            traversal_filters.append(__.outE().filter_edges(**outE))
+        if inE:
+            traversal_filters.append(__.inE().filter_edges(**inE))
+        if bothE:
+            traversal_filters.append(__.bothE().filter_edges(**bothE))
+        if inV:
+            traversal_filters.append(__.inV().filter_nodes(**inV))
+        if outV:
+            traversal_filters.append(__.outV().filter_nodes(**outV))
+        if bothV:
+            traversal_filters.append(__.bothV().filter_nodes(**bothV))
+        if otherV:
+            traversal_filters.append(__.otherV().filter_nodes(**otherV))
+
+        # execute filters
+        if traversal_filters.__len__() > 0:
+            if condition_type == "or":
+                self.or_(*traversal_filters)
+            elif condition_type == "and":
+                self.and_(*traversal_filters)
+            elif condition_type == "not":
+                self.not_(*traversal_filters)
+
+        # run the child query
+        if _and:
+            self.filter_by_traversals(**_and, condition_type="and")
+        if _or:
+            self.filter_by_traversals(**_or, condition_type="or")
+        if _not:
+            self.filter_by_traversals(**_not, condition_type="not")
+                                     
+        return self
 
     def filter_edges(self, **kwargs: RelationshipFiltersConfigType):
         if kwargs.keys().__len__() == 0:
@@ -137,10 +179,42 @@ def hasValue(*args):
         if property_filters:
             self.filter_by_properties(**property_filters)
 
-        # filter:pagination
+        # order by 
+        order_by = kwargs.get("order_by")
+        if order_by:
+            for property_name, order_type in order_by.items():
+                self.order().by(property_name, getattr(Order, order_type))
+  
+        # pagination
         paginate_options = kwargs.get("paginate")
         if paginate_options:
             self.paginate(**paginate_options)
+        
+        return self
+    
+    def filter_traversals_by_count(self,
+                        _and=None, 
+                        _or=None,
+                        _not=None,
+                        conditions: typing.List[typing.Any]=None,
+                        filters: typing.Dict=None,
+                        order=typing.Literal['asc', 'desc', None],
+                        condition_type: typing.Literal["or", "and", "not",]= "and",
+                        ):
+        for condition in conditions:
+            for predicate, count_ in condition.items():
+                self.filter_by_traversals(**filters)\
+                    .count().is_(getattr(P, predicate)(count_))
+                
+
+        if _and:
+            self.filter_traversals_by_count(**_and, condition_type="and")
+        if _or:
+            self.filter_traversals_by_count(**_or, condition_type="or")
+        if _not:
+            self.filter_traversals_by_count(**_not, condition_type="not")
+           
+        return self
 
     def filter_nodes(self, **kwargs: NodeFiltersConfigType):
         if kwargs.keys().__len__() == 0:
@@ -148,14 +222,27 @@ def hasValue(*args):
 
         # filter by labels
         labels = kwargs.get("labels")
-        if labels:
-            self.filter_by_labels(*labels)
+        if labels: self.filter_by_labels(*labels)
     
         # filter by properties
         property_filters = kwargs.get("properties")
-        if property_filters:
-            self.filter_by_properties(**property_filters)
+        if property_filters: self.filter_by_properties(**property_filters)
 
+        
+        # filter by traversal filters
+        traversals_filters = kwargs.get("traversals")
+        if traversals_filters:
+            traversals = []
+            if traversals_filters.get("by_count"): # 1. based on the counts 
+                traversals.append(
+                    __.filter_traversals_by_count(**traversals_filters.get("by_count"))
+                )
+            # if traversals_filters.get("by_filters"): # 2. based on filter on relationship
+            #     traversals.append(
+            #         __.filter_traversals_by_count(**traversals_filters.get("by_filters"))
+            #     )
+            self.where(*traversals)
+ 
         # order by 
         order_by = kwargs.get("order_by")
         if order_by:
@@ -175,14 +262,19 @@ def hasValue(*args):
         for traversal_type, traversal_option in graph_traversal_config['g'].items():
             if traversal_type == "V":
                 if "filters" in traversal_option:
+                    # filter by properties, traversals (count, filters)
                     self.V().filter_nodes(**traversal_option['filters'])
+
                 if "traversals" in traversal_option:
                     # TODO - detect outE based on the starting key 
                     for traversal_type, traversal_config in traversal_option['traversals'].items():
                         if traversal_type == "out_e":
                             if "filters" in traversal_config:
-                                self.outE().filter_edges(**traversal_config['filters'])
+                                self.outE().filter_nodes_or_edges(**traversal_config['filters'])
         
+            # self.project('v','e').by(__.id()).by(__.outE().count()).order().by("e")
+            self.project('v','e').by(__.id()).by(__.outE().count()) #TODO - remove this after test 
+
         return self
     # def traverse_through(self, *edge_labels,  direction=None, **edge_search_kwargs):
     #     if direction not in ["in", "out", None]:
@@ -199,7 +291,8 @@ def hasValue(*args):
     #     # return _.path().by(__.elementMap())            
     #     return self
 
-
+    
+ 
     def create_vertex(self, label, **properties):
         self.addV(label)
         for k, v in properties.items():
@@ -242,6 +335,21 @@ class __(AnonymousTraversal):
     @classmethod
     def search_graph(cls, **kwargs):
         return cls.graph_traversal(None, None, Bytecode()).search_graph(**kwargs)
+
+    @classmethod
+    def filter_traversals_by_count(cls,
+                        _and=None, 
+                        _or=None,
+                        _not=None,
+                        conditions: typing.List[typing.Any]=None,
+                        filters: typing.Dict=None,
+                        order=typing.Literal['asc', 'desc', None],
+                        condition_type: typing.Literal["or", "and", "not",]= "and"
+                        ):
+        return cls.graph_traversal(None, None, Bytecode()).filter_traversals_by_count(
+            _and=_and, _or=_or, _not=_not, conditions=conditions, filters=filters,
+            condition_type=condition_type
+        )
 
     # @classmethod
     # def traverse_through(cls, *edge_labels,  direction=None, **edge_search_kwargs):
