@@ -16,7 +16,7 @@ g:
         page_size: 5
         page_number: 1
     traversals:
-      out_e:
+      outE:
         filters:
           labels:
           - route

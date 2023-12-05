@@ -22,10 +22,9 @@ g:
                   dist:
                     gte: 100 
           conditions:
-          - gte : 2
-          - lte: 5
-        # by_filters: # this is filter by edges 
-        #   pass
+          - eq : 1
+          # - gte : 1
+          # - lte: 2
       paginate:
         page_size: 10
         page_number: 1
