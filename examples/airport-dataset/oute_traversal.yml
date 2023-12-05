@@ -13,7 +13,7 @@ g:
           code:
             within: [AUS, ANC, MCO]
       paginate:
-        page_size: 20
+        page_size: 5
         page_number: 1
     traversals:
       out_e:

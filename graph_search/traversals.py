@@ -192,10 +192,10 @@ class InvanaTraversal(GraphTraversal):
         
         return self
     
-    def filter_traversals_by_count(self,
+    def filter_by_traversals_count(self,
                         _and=None, 
                         _or=None,
-                        _not=None,
+                        _not=None, 
                         conditions: typing.List[typing.Any]=None,
                         filters: typing.Dict=None,
                         condition_type: typing.Literal["or", "and", "not",]= "and",
@@ -206,11 +206,11 @@ class InvanaTraversal(GraphTraversal):
                     .count().is_(getattr(P, predicate)(count_))
         
         if _and:
-            self.filter_traversals_by_count(**_and, condition_type="and")
+            self.filter_by_traversals_count(**_and, condition_type="and")
         if _or:
-            self.filter_traversals_by_count(**_or, condition_type="or")
+            self.filter_by_traversals_count(**_or, condition_type="or")
         if _not:
-            self.filter_traversals_by_count(**_not, condition_type="not")
+            self.filter_by_traversals_count(**_not, condition_type="not")
         return self
 
     def filter_nodes(self, **kwargs: NodeFiltersConfigType):
@@ -232,11 +232,11 @@ class InvanaTraversal(GraphTraversal):
             traversals = []
             if traversals_filters.get("by_count"): # 1. based on the counts 
                 traversals.append(
-                    __.filter_traversals_by_count(**traversals_filters.get("by_count"))
+                    __.filter_by_traversals_count(**traversals_filters.get("by_count"))
                 )
             # if traversals_filters.get("by_filters"): # 2. based on filter on relationship
             #     traversals.append(
-            #         __.filter_traversals_by_count(**traversals_filters.get("by_filters"))
+            #         __.filter_by_traversals_count(**traversals_filters.get("by_filters"))
             #     )
             self.where(*traversals)
  
@@ -339,7 +339,7 @@ class __(AnonymousTraversal):
         return cls.graph_traversal(None, None, Bytecode()).search_graph(**kwargs)
 
     @classmethod
-    def filter_traversals_by_count(cls,
+    def filter_by_traversals_count(cls,
                         _and=None, 
                         _or=None,
                         _not=None,
@@ -347,7 +347,7 @@ class __(AnonymousTraversal):
                         filters: typing.Dict=None,
                         condition_type: typing.Literal["or", "and", "not",]= "and"
                         ):
-        return cls.graph_traversal(None, None, Bytecode()).filter_traversals_by_count(
+        return cls.graph_traversal(None, None, Bytecode()).filter_by_traversals_count(
             _and=_and, _or=_or, _not=_not, conditions=conditions, filters=filters,
             condition_type=condition_type
         )
