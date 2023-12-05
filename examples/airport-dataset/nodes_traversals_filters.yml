@@ -24,7 +24,6 @@ g:
           conditions:
           - gte : 2
           - lte: 5
-          order: asc # asc, desc
         # by_filters: # this is filter by edges 
         #   pass
       paginate:

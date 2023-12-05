@@ -7,7 +7,7 @@ search = GraphSearch("ws://localhost:8182/gremlin")
 
 example_configs = [
     # "examples/airport-dataset/oute_traversal.yml",
-    "examples/airport-dataset/simple_nodes_filters.yml",
+    # "examples/airport-dataset/simple_nodes_filters.yml",
     "examples/airport-dataset/nodes_traversals_filters.yml"
 ]
 

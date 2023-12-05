@@ -198,22 +198,19 @@ class InvanaTraversal(GraphTraversal):
                         _not=None,
                         conditions: typing.List[typing.Any]=None,
                         filters: typing.Dict=None,
-                        order=typing.Literal['asc', 'desc', None],
                         condition_type: typing.Literal["or", "and", "not",]= "and",
                         ):
         for condition in conditions:
             for predicate, count_ in condition.items():
-                self.filter_by_traversals(**filters)\
+                self.filter_by_traversals(**filters, condition_type=condition_type)\
                     .count().is_(getattr(P, predicate)(count_))
-                
-
+        
         if _and:
             self.filter_traversals_by_count(**_and, condition_type="and")
         if _or:
             self.filter_traversals_by_count(**_or, condition_type="or")
         if _not:
             self.filter_traversals_by_count(**_not, condition_type="not")
-           
         return self
 
     def filter_nodes(self, **kwargs: NodeFiltersConfigType):
@@ -348,7 +345,6 @@ class __(AnonymousTraversal):
                         _not=None,
                         conditions: typing.List[typing.Any]=None,
                         filters: typing.Dict=None,
-                        order=typing.Literal['asc', 'desc', None],
                         condition_type: typing.Literal["or", "and", "not",]= "and"
                         ):
         return cls.graph_traversal(None, None, Bytecode()).filter_traversals_by_count(
