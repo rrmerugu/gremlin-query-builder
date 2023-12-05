@@ -4,8 +4,8 @@ import yaml
 
 search = GraphSearch("ws://localhost:8182/gremlin")
 
-traversal_config_file = "examples/airport-dataset/oute_traversal.yml"
-# traversal_config_file = "examples/airport-dataset/simple_nodes_filters.yml"
+# traversal_config_file = "examples/airport-dataset/oute_traversal.yml"
+traversal_config_file = "examples/airport-dataset/simple_nodes_filters.yml"
 
 
 traversal_config = yaml.safe_load(open(traversal_config_file))

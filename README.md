@@ -14,7 +14,7 @@ The purpose of this project is to define graph filters and traversals using yaml
 - [ ] Traverse to Nodes 
 - [ ] Subgraph
 
-
+## Usage
 
 ## Learn more
 - https://tinkerpop.apache.org/docs/current/reference/#is-step

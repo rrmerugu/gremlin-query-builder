@@ -2,6 +2,7 @@ from gremlin_python.process.graph_traversal import GraphTraversal, GraphTraversa
 from gremlin_python.process.traversal import P, TextP, Bytecode, Cardinality
 from gremlin_python.process.graph_traversal import __ as AnonymousTraversal
 import copy
+from gremlin_python.process.translator import Order
 from .type_defs import NodeFiltersConfigType, RelationshipFiltersConfigType, \
       PropertyFilterType, GraphTraversalConfigType
 from .constants import SearchTextPredicate, SearchPredicates
@@ -17,21 +18,31 @@ class InvanaTraversal(GraphTraversal):
     def clone(self):
         return InvanaTraversal(self.graph, self.traversal_strategies, copy.deepcopy(self.bytecode))
 
+    def paginate(self, page_size:int = 10, page_number: int= 1):
+        self.bytecode.add_step("limit", page_size)
+        pagination_args = [(page_size * (page_number - 1)), (page_size * page_number)]
+        self.bytecode.add_step("range", *pagination_args)
+        return self
 
     # filter by properties 
-    def filter_by_labels(self, *labels, _and: typing.List[str]=None,
-                         _or=typing.List[str], _not=typing.List[str] ):
+    def filter_by_labels(self, 
+                         *labels, 
+                         _and: typing.List[str]=None,
+                         _or=typing.List[str], 
+                         _not=typing.List[str] ):
         if labels.__len__() == 1: # for single label
             self.bytecode.add_step("hasLabel", labels[0])
         else: # fore more than one labels
             args =[__.hasLabel(label) for label in labels]
             self.bytecode.add_step("or", *args)
+        # TODO - add logics for _and, _or, _not 
 
-    def filter_by_properties(self, _and: PropertyFilterType=None, 
-                          _or: PropertyFilterType=None, 
-                          _not: PropertyFilterType=None,
-                          condition_type: typing.Literal["or", "and", "not",]= "and",
-                          **kwargs: PropertyFilterType ):
+    def filter_by_properties(self, 
+                _and: PropertyFilterType=None, 
+                _or: PropertyFilterType=None, 
+                _not: PropertyFilterType=None,
+                condition_type: typing.Literal["or", "and", "not",]= "and",
+                **kwargs: PropertyFilterType ):
         """
         Example usage 
         {
@@ -79,6 +90,7 @@ def hasValue(*args):
         if kwargs.keys().__len__() == 0 and _and is None and  _or is None and _not is None:
             raise Exception("filter_by_properties() should be used with kwargs or ['_and', '_or', '_not']")
 
+        # create filters 
         filters = []
         for property_name, property_filter in kwargs.items():
             for filter_key, filter_value in property_filter.items():
@@ -92,6 +104,7 @@ def hasValue(*args):
                 elif getattr(SearchPredicates, filter_key):
                     filters.append(__.has(property_name, getattr(P, filter_key)(filter_value) ))
         
+        # execute filters
         if filters.__len__() > 0:
             if condition_type == "or":
                 self.or_(*filters)
@@ -100,6 +113,7 @@ def hasValue(*args):
             elif condition_type == "not":
                 self.not_(*filters)
 
+        # run the child query
         if _and:
             self.filter_by_properties(**_and, condition_type="and")
         
@@ -131,7 +145,6 @@ def hasValue(*args):
     def filter_nodes(self, **kwargs: NodeFiltersConfigType):
         if kwargs.keys().__len__() == 0:
             raise Exception("filter_nodes() should have kwargs")
-        property_filters = kwargs.get("properties")
 
         # filter by labels
         labels = kwargs.get("labels")
@@ -139,10 +152,17 @@ def hasValue(*args):
             self.filter_by_labels(*labels)
     
         # filter by properties
+        property_filters = kwargs.get("properties")
         if property_filters:
             self.filter_by_properties(**property_filters)
 
-        # filter:pagination
+        # order by 
+        order_by = kwargs.get("order_by")
+        if order_by:
+            for property_name, order_type in order_by.items():
+                self.order().by(property_name, getattr(Order, order_type))
+  
+        # pagination
         paginate_options = kwargs.get("paginate")
         if paginate_options:
             self.paginate(**paginate_options)
@@ -179,11 +199,6 @@ def hasValue(*args):
     #     # return _.path().by(__.elementMap())            
     #     return self
 
-    def paginate(self, page_size:int = 10, page_number: int= 1):
-        self.bytecode.add_step("limit", page_size)
-        pagination_args = [(page_size * (page_number - 1)), (page_size * page_number)]
-        self.bytecode.add_step("range", *pagination_args)
-        return self
 
     def create_vertex(self, label, **properties):
         self.addV(label)
