@@ -27,13 +27,10 @@ class GraphSearch:
         print(f"Graphsearch is using gremlinpython=={__version__.version}")
 
     @property
-    def graph(self) -> InvanaTraversal:
-        # this will generate the `g`
+    def graph(self) -> InvanaTraversal: # this will generate the `g`       
         return traversal(traversal_source_class=InvanaTraversalSource) \
                         .withRemote(self.connection)
  
     def search_graph(self, graph_traversal_config: GraphTraversalConfigType)-> InvanaTraversal:
-        result = self.graph.search_graph(**graph_traversal_config)
-
-        return result
-   
+        return self.graph.search_graph(**graph_traversal_config)
+ 
