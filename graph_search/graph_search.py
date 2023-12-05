@@ -32,10 +32,8 @@ class GraphSearch:
         return traversal(traversal_source_class=InvanaTraversalSource) \
                         .withRemote(self.connection)
  
-    def search_graph(self, graph_traversal_config: GraphTraversalConfigType):
-        result = self.graph.search_graph(**graph_traversal_config) \
-        .project('v','e').by().by(__.outE().count())\
-        .toList() 
-        self.connection.close()
+    def search_graph(self, graph_traversal_config: GraphTraversalConfigType)-> InvanaTraversal:
+        result = self.graph.search_graph(**graph_traversal_config)
+
         return result
    
