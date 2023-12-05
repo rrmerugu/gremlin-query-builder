@@ -246,13 +246,19 @@ class InvanaTraversal(GraphTraversal):
         # order by 
         order_by = kwargs.get("order_by")
         if order_by:
-            for property_name, order_type in order_by.items():
+            for property_name, order_type in order_by.get("properties", {}).items():
                 self.order().by(property_name, getattr(Order, order_type))
+
+            for traversal_name, order_type in order_by.get("traversals_count", {}).items():
+                self.project('v','e').by().by(getattr(__, f"{traversal_name}")().count())\
+                    .order().by("e", getattr(Order, order_type)).select("v")
   
         # pagination
         paginate_options = kwargs.get("paginate")
         if paginate_options:
             self.paginate(**paginate_options)
+
+        # self.project('v','e').by(__.id()).by(__.outE().count()).order().by("e").select("v")
 
         return self
     
@@ -264,7 +270,7 @@ class InvanaTraversal(GraphTraversal):
                 if "filters" in traversal_option:
                     # filter by properties, traversals (count, filters)
                     self.V().filter_nodes(**traversal_option['filters'])
-
+                    
                 if "traversals" in traversal_option:
                     # TODO - detect outE based on the starting key 
                     for traversal_type, traversal_config in traversal_option['traversals'].items():
@@ -273,7 +279,6 @@ class InvanaTraversal(GraphTraversal):
                                 self.outE().filter_nodes_or_edges(**traversal_config['filters'])
         
             # self.project('v','e').by(__.id()).by(__.outE().count()).order().by("e")
-            self.project('v','e').by(__.id()).by(__.outE().count()) #TODO - remove this after test 
 
         return self
     # def traverse_through(self, *edge_labels,  direction=None, **edge_search_kwargs):

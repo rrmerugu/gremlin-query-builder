@@ -31,5 +31,7 @@ g:
         page_size: 10
         page_number: 1
       order_by: #asc desc shuffle
-        code: desc
-        # icao: desc
+        properties:
+          code: desc
+        traversals_count:
+          outE: desc
