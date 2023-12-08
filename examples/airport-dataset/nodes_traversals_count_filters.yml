@@ -20,11 +20,11 @@ g:
               properties: # _and, _or, _not
                 _or:
                   dist:
-                    gte: 100 
+                    gte: 10
+                    
           conditions:
-          - eq : 1
-          # - gte : 1
-          # - lte: 2
+          - gte : 1
+          - lte: 2
       paginate:
         page_size: 10
         page_number: 1

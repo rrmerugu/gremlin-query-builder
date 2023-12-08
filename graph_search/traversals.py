@@ -14,7 +14,6 @@ class InvanaTraversal(GraphTraversal):
     def __init__(self, graph, traversal_strategies, bytecode):
         super(InvanaTraversal, self).__init__(graph, traversal_strategies, bytecode)
 
-
     def clone(self):
         return InvanaTraversal(self.graph, self.traversal_strategies, copy.deepcopy(self.bytecode))
 
@@ -147,14 +146,15 @@ class InvanaTraversal(GraphTraversal):
             traversal_filters.append(__.otherV().filter_nodes(**otherV))
 
         # execute filters
-        if traversal_filters.__len__() > 0:
+
+ 
+        if traversal_filters.__len__() > 1:
             if condition_type == "or":
                 self.or_(*traversal_filters)
             elif condition_type == "and":
                 self.and_(*traversal_filters)
             elif condition_type == "not":
                 self.not_(*traversal_filters)
-
         # run the child query
         if _and:
             self.filter_by_traversals(**_and, condition_type="and")
@@ -200,11 +200,23 @@ class InvanaTraversal(GraphTraversal):
                         filters: typing.Dict=None,
                         condition_type: typing.Literal["or", "and", "not",]= "and",
                         ):
+        
+        condition_traversals= []
+
         for condition in conditions:
             for predicate, count_ in condition.items():
-                self.filter_by_traversals(**filters, condition_type=condition_type)\
+                condition_traversals.append(
+                    __.filter_by_traversals(**filters, condition_type=condition_type)\
                     .count().is_(getattr(P, predicate)(count_))
+                )
         
+        if condition_type == "and":
+            self.and_(*condition_traversals)
+        elif condition_type == "or":
+            self.or_(*condition_traversals)
+        elif condition_type == "not":
+            self.not_(*condition_traversals)
+
         if _and:
             self.filter_by_traversals_count(**_and, condition_type="and")
         if _or:
@@ -240,8 +252,8 @@ class InvanaTraversal(GraphTraversal):
                     __.filter_by_traversals(**traversals_filters.get("by_filters"))
                 )
 
-            # traversals = [__.and_(*traversals_by_count, *traversals_by_filters)]
-            traversals = traversals_by_count
+            traversals = [__.and_(*traversals_by_count, *traversals_by_filters)]
+            # traversals = traversals_by_count
             self.where(*traversals)
  
         # order by 
