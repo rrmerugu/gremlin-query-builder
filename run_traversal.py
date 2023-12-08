@@ -21,7 +21,9 @@ for traversal_config_file in example_configs:
         query = result.bytecode
         print("====query", query)
         result = result.project('v','e').by(__.id()).by(__.outE().count())\
-        .order().by("e", Order.desc).toList()  
+        .toList()  
+
+        # .order().by("e", Order.desc) \
     elif "nodes_traversals_all_filters" in  traversal_config_file:
         # result = result.project('v','e').by(__.id()).by(__.outE().count())\
         # .toList()  

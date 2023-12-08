@@ -32,4 +32,4 @@ g:
         properties:
           code: desc
         traversals_count:
-          outE: desc
+          outE: asc
