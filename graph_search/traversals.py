@@ -116,11 +116,7 @@ class InvanaTraversal(GraphTraversal):
     
         return self
 
-    def filter_by_traversals(self,
-                _and: PropertyFilterType=None, 
-                _or: PropertyFilterType=None, 
-                _not: PropertyFilterType=None,
-                condition_type: typing.Literal["or", "and", "not",]= "and",
+    def traverse(self,  
                 outE: RelationshipFiltersConfigType =None,
                 inE: RelationshipFiltersConfigType =None,
                 bothE: RelationshipFiltersConfigType =None,
@@ -128,33 +124,85 @@ class InvanaTraversal(GraphTraversal):
                 outV: NodeFiltersConfigType =None,
                 bothV: NodeFiltersConfigType =None,
                 otherV: NodeFiltersConfigType =None ):
+        if outE:
+            self.outE().filter_edges(**outE)
+        if inE:
+            self.inE().filter_edges(**inE)
+        if bothE:
+            self.bothE().filter_edges(**bothE)
+        if inV:
+            self.inV().filter_nodes(**inV)
+        if outV:
+            self.outV().filter_nodes(**outV)
+        if bothV:
+            self.bothV().filter_nodes(**bothV)
+        if otherV:
+            self.otherV().filter_nodes(**otherV)
+
+        return self
+
+    def filter_by_traversals(self,
+                *filters, 
+                condition_type: typing.Literal["or", "and", "not",]= "and",
+                _and: PropertyFilterType=None, 
+                _or: PropertyFilterType=None, 
+                _not: PropertyFilterType=None,
+                outE: RelationshipFiltersConfigType =None,
+                inE: RelationshipFiltersConfigType =None,
+                bothE: RelationshipFiltersConfigType =None,
+                inV: NodeFiltersConfigType =None,
+                outV: NodeFiltersConfigType =None,
+                bothV: NodeFiltersConfigType =None,
+                otherV: NodeFiltersConfigType =None ):
+        """
+        
+
+
+        Args:
+            _and (PropertyFilterType, optional): _description_. Defaults to None.
+            _or (PropertyFilterType, optional): _description_. Defaults to None.
+            _not (PropertyFilterType, optional): _description_. Defaults to None.
+            condition_type (typing.Literal[&quot;or&quot;, &quot;and&quot;, &quot;not&quot;,], optional): _description_. Defaults to "and".
+            outE (RelationshipFiltersConfigType, optional): _description_. Defaults to None.
+            inE (RelationshipFiltersConfigType, optional): _description_. Defaults to None.
+            bothE (RelationshipFiltersConfigType, optional): _description_. Defaults to None.
+            inV (NodeFiltersConfigType, optional): _description_. Defaults to None.
+            outV (NodeFiltersConfigType, optional): _description_. Defaults to None.
+            bothV (NodeFiltersConfigType, optional): _description_. Defaults to None.
+            otherV (NodeFiltersConfigType, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """
+
         # TODO - make kwargs to **kwargs
         traversal_filters = []
         if outE:
-            traversal_filters.append(__.outE().filter_edges(**outE))
+            traversal_filters.append(__.traverse(outE=outE))
         if inE:
-            traversal_filters.append(__.inE().filter_edges(**inE))
+            traversal_filters.append(__.traverse(inE=inE))
         if bothE:
-            traversal_filters.append(__.bothE().filter_edges(**bothE))
+            traversal_filters.append(__.traverse(both=bothE))
         if inV:
-            traversal_filters.append(__.inV().filter_nodes(**inV))
+            traversal_filters.append(__.traverse(inV=inV))
         if outV:
-            traversal_filters.append(__.outV().filter_nodes(**outV))
+            traversal_filters.append(__.traverse(outV=outV))
         if bothV:
-            traversal_filters.append(__.bothV().filter_nodes(**bothV))
+            traversal_filters.append(__.traverse(bothV=bothV))
         if otherV:
-            traversal_filters.append(__.otherV().filter_nodes(**otherV))
+            traversal_filters.append(__.traverse(otherV=otherV))
 
         # execute filters
 
  
         if traversal_filters.__len__() > 1:
             if condition_type == "or":
-                self.or_(*traversal_filters)
+                __.or_(*traversal_filters)
             elif condition_type == "and":
-                self.and_(*traversal_filters)
+                __.and_(*traversal_filters)
             elif condition_type == "not":
-                self.not_(*traversal_filters)
+                __.not_(*traversal_filters)
+
         # run the child query
         if _and:
             self.filter_by_traversals(**_and, condition_type="and")
@@ -206,7 +254,7 @@ class InvanaTraversal(GraphTraversal):
         for condition in conditions:
             for predicate, count_ in condition.items():
                 condition_traversals.append(
-                    __.filter_by_traversals(**filters, condition_type=condition_type)\
+                    __.traverse(**filters)\
                     .count().is_(getattr(P, predicate)(count_))
                 )
         
@@ -282,9 +330,9 @@ class InvanaTraversal(GraphTraversal):
                     # filter by properties, traversals (count, filters)
                     self.V().filter_nodes(**traversal_option['filters'])
                     
-                # if "traversals" in traversal_option:
-                #     # TODO - detect outE based on the starting key 
-                #     self.filter_by_traversals(**traversal_option['traversals'])
+                if "traversals" in traversal_option:
+                    # TODO - detect outE based on the starting key 
+                    self.filter_by_traversals(**traversal_option['traversals'])
  
         return self
  
@@ -343,6 +391,20 @@ class __(AnonymousTraversal):
         return cls.graph_traversal(None, None, Bytecode()).filter_by_traversals_count(
             _and=_and, _or=_or, _not=_not, conditions=conditions, filters=filters,
             condition_type=condition_type
+        )
+    
+    @classmethod
+    def traverse(cls,
+                outE: RelationshipFiltersConfigType =None,
+                inE: RelationshipFiltersConfigType =None,
+                bothE: RelationshipFiltersConfigType =None,
+                inV: NodeFiltersConfigType =None,
+                outV: NodeFiltersConfigType =None,
+                bothV: NodeFiltersConfigType =None,
+                otherV: NodeFiltersConfigType =None ):
+        return cls.graph_traversal(None, None, Bytecode()).traverse(
+            outE=outE, inE=inE, bothE=bothE, 
+            inV=inV, outV=outV, bothV=bothV, otherV=otherV
         )
     
     @classmethod
