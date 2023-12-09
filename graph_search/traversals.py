@@ -138,7 +138,6 @@ class InvanaTraversal(GraphTraversal):
             self.bothV().filter_nodes(**bothV)
         if otherV:
             self.otherV().filter_nodes(**otherV)
-
         return self
 
     def filter_by_traversals(self,
@@ -177,39 +176,24 @@ class InvanaTraversal(GraphTraversal):
 
         # TODO - make kwargs to **kwargs
         traversal_filters = []
-        if outE:
-            traversal_filters.append(__.traverse(outE=outE))
-        if inE:
-            traversal_filters.append(__.traverse(inE=inE))
-        if bothE:
-            traversal_filters.append(__.traverse(both=bothE))
-        if inV:
-            traversal_filters.append(__.traverse(inV=inV))
-        if outV:
-            traversal_filters.append(__.traverse(outV=outV))
-        if bothV:
-            traversal_filters.append(__.traverse(bothV=bothV))
-        if otherV:
-            traversal_filters.append(__.traverse(otherV=otherV))
+        if outE:traversal_filters.append(__.traverse(outE=outE))
+        if inE:traversal_filters.append(__.traverse(inE=inE))
+        if bothE: traversal_filters.append(__.traverse(both=bothE))
+        if inV: traversal_filters.append(__.traverse(inV=inV))
+        if outV: traversal_filters.append(__.traverse(outV=outV))
+        if bothV:traversal_filters.append(__.traverse(bothV=bothV))
+        if otherV:traversal_filters.append(__.traverse(otherV=otherV))
 
         # execute filters
-
- 
-        if traversal_filters.__len__() > 1:
-            if condition_type == "or":
-                __.or_(*traversal_filters)
-            elif condition_type == "and":
-                __.and_(*traversal_filters)
-            elif condition_type == "not":
-                __.not_(*traversal_filters)
+        if traversal_filters.__len__() > 0 :
+            if condition_type == "or": self.or_(*traversal_filters)
+            elif condition_type == "and": self.and_(*traversal_filters)
+            elif condition_type == "not": self.not_(*traversal_filters)
 
         # run the child query
-        if _and:
-            self.filter_by_traversals(**_and, condition_type="and")
-        if _or:
-            self.filter_by_traversals(**_or, condition_type="or")
-        if _not:
-            self.filter_by_traversals(**_not, condition_type="not")
+        if _and:self.filter_by_traversals(**_and, condition_type="and")
+        if _or:self.filter_by_traversals(**_or, condition_type="or")
+        if _not:self.filter_by_traversals(**_not, condition_type="not")
                                      
         return self
 
@@ -333,7 +317,17 @@ class InvanaTraversal(GraphTraversal):
                 if "traversals" in traversal_option:
                     # TODO - detect outE based on the starting key 
                     self.filter_by_traversals(**traversal_option['traversals'])
- 
+            elif traversal_type == "E":
+                if "filters" in traversal_option:
+                    # filter by properties, traversals (count, filters)
+                    self.E().filter_nodes(**traversal_option['filters'])
+                    
+                if "traversals" in traversal_option:
+                    # TODO - detect outE based on the starting key 
+                    self.filter_by_traversals(**traversal_option['traversals'])
+
+
+
         return self
  
     def create_vertex(self, label, **properties):

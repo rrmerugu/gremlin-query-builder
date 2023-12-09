@@ -9,8 +9,8 @@ search = GraphSearch("ws://localhost:8182/gremlin")
 example_configs = [
     # "examples/airport-dataset/oute_traversal.yml",
     # "examples/airport-dataset/simple_nodes_filters.yml",
-    "examples/airport-dataset/nodes_traversals_count_filters.yml"
-    # "examples/airport-dataset/nodes_traversals_all_filters.yml"
+    # "examples/airport-dataset/nodes_traversals_count_filters.yml"
+    "examples/airport-dataset/nodes_traversals_all_filters.yml"
 ]
 
 
@@ -22,6 +22,7 @@ for traversal_config_file in example_configs:
         print("====query", query)
         result = result.project('v','e').by(__.id()).by(__.outE().count())\
         .toList()  
+        # result = result.toList()
 
         # .order().by("e", Order.desc) \
     elif "nodes_traversals_all_filters" in  traversal_config_file:
@@ -29,7 +30,13 @@ for traversal_config_file in example_configs:
         # .toList()  
         # result = result.project('v','e').by(__.id()).by(__.outE())\
         # result = result.toList()  
-        result = result.outE().toList()
+        query = result.bytecode
+        print("====query", query)
+        # result = result.project('v','e').by(__.id()).by(__.outE().count())\
+        # .toList()
+        result = result.count()\
+        .toList()
+        # result = result.count().toList()  
     else:
         result = result.toList()
     print("\n\n\n")
