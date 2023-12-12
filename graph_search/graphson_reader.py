@@ -80,9 +80,9 @@ class InvanaVertexDeserializer(graphsonV3d0.VertexDeserializer):
     def objectify(cls, d, reader):
         properties = []
         for prop_key, prop_value in d.get("properties", {}).items():
-            properties.extend(reader.toObject(prop_value))
+            properties.extend(reader.to_object(prop_value))
 
-        return Node(reader.toObject(get_id(d["id"])),
+        return Node(reader.to_object(get_id(d["id"])),
                     d.get("label", "vertex"),
                     properties=convert_vertex_properties_to_dict(properties))
 
@@ -93,12 +93,12 @@ class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
     def objectify(cls, d, reader):
         properties = []
         for prop_key, prop_value in d.get("properties", {}).items():
-            properties.append(reader.toObject(prop_value))
+            properties.append(reader.to_object(prop_value))
 
-        return RelationShip(reader.toObject(get_id(d["id"])),
+        return RelationShip(reader.to_object(get_id(d["id"])),
                             d.get("label", "edge"),
-                            Node(reader.toObject(d["outV"]), d.get("outVLabel", "vertex")),
-                            Node(reader.toObject(d["inV"]), d.get("inVLabel", "vertex")),
+                            Node(reader.to_object(d["outV"]), d.get("outVLabel", "vertex")),
+                            Node(reader.to_object(d["inV"]), d.get("inVLabel", "vertex")),
                             properties=convert_edge_properties_to_dict(properties))
 
 
@@ -106,15 +106,15 @@ class InvanaPathDeserializer(graphsonV3d0.PathDeserializer):
 
     @classmethod
     def objectify(cls, d, reader):
-        return Path(reader.toObject(d["labels"]), reader.toObject(d["objects"]))
+        return Path(reader.to_object(d["labels"]), reader.to_object(d["objects"]))
 
 
 # class PropertyDeserializer(graphsonV3d0.PropertyDeserializer):
 #
 #     @classmethod
 #     def objectify(cls, d, reader):
-#         element = reader.toObject(d["element"]) if "element" in d else None
-#         return Property(d["key"], reader.toObject(d["value"]), element)
+#         element = reader.to_object(d["element"]) if "element" in d else None
+#         return Property(d["key"], reader.to_object(d["value"]), element)
 
 
 INVANA_DESERIALIZER_MAP = {

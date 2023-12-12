@@ -19,6 +19,8 @@ for traversal_config_file in example_configs:
     traversal_config = yaml.safe_load(open(traversal_config_file))
     result = search.search_graph(traversal_config)
     bytecode =result.bytecode
+    print("===query", bytecode)
+
     if "nodes_traversals_count_filters" in  traversal_config_file:
         print("====query", query)
         result = result.project('v','e').by(__.id()).by(__.outE().count())\
@@ -39,7 +41,7 @@ for traversal_config_file in example_configs:
         .toList()
         # result = result.count().toList()  
     else:
-        result = result.toList()
+        result = result.to_list()
     print("\n\n\n")
     print(f"={traversal_config_file}============================================")
     for r in result:
