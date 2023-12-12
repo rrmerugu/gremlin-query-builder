@@ -1,0 +1,32 @@
+g:
+  V:
+    filters: # _and, _or, _not 
+      labels: # _and, _or, _not
+        - airport
+      properties: # _and, _or, _not
+        code:
+          startingWith: AU
+        _or:
+          icao:
+            eq: KTPA
+          code:
+            within: [AUS, ANC, MCO]
+      paginate:
+        page_size: 10
+        page_number: 1
+      order_by: #asc desc shuffle
+        properties:
+          code: desc
+        traversals_count:
+          outE: desc
+    traversals:
+      outE:
+        labels:
+          - route
+        # properties: # _and, _or, _not
+        #   dist:
+        #     gte: 100
+        #     lte: 350
+        order_by: #asc desc shuffle
+          properties:
+            dist: desc

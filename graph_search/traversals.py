@@ -23,6 +23,17 @@ class InvanaTraversal(GraphTraversal):
         self.bytecode.add_step("range", *pagination_args)
         return self
 
+    def order_by(self, properties=None, traversals_count=None):
+        if properties is None: properties = {}
+        if traversals_count is None: traversals_count = {}
+        for property_name, order_type in properties.items():
+            self.order().by(property_name, getattr(Order, order_type))
+
+        for traversal_name, order_type in traversals_count.items():
+            self.project('v','e').by().by(getattr(__, f"{traversal_name}")().count())\
+                .order().by("e", getattr(Order, order_type)).select("v")
+        return self
+
     # filter by properties 
     def filter_by_labels(self, 
                         *labels, 
@@ -214,8 +225,7 @@ class InvanaTraversal(GraphTraversal):
         # order by 
         order_by = kwargs.get("order_by")
         if order_by:
-            for property_name, order_type in order_by.items():
-                self.order().by(property_name, getattr(Order, order_type))
+            self.order_by(**order_by)
   
         # pagination
         paginate_options = kwargs.get("paginate")
@@ -291,12 +301,7 @@ class InvanaTraversal(GraphTraversal):
         # order by 
         order_by = kwargs.get("order_by")
         if order_by:
-            for property_name, order_type in order_by.get("properties", {}).items():
-                self.order().by(property_name, getattr(Order, order_type))
-
-            for traversal_name, order_type in order_by.get("traversals_count", {}).items():
-                self.project('v','e').by().by(getattr(__, f"{traversal_name}")().count())\
-                    .order().by("e", getattr(Order, order_type)).select("v")
+            self.order_by(**order_by)
   
         # pagination
         paginate_options = kwargs.get("paginate")
@@ -316,7 +321,7 @@ class InvanaTraversal(GraphTraversal):
                     
                 if "traversals" in traversal_option:
                     # TODO - detect outE based on the starting key 
-                    self.filter_by_traversals(**traversal_option['traversals'])
+                    self.traverse(**traversal_option['traversals'])
             elif traversal_type == "E":
                 if "filters" in traversal_option:
                     # filter by properties, traversals (count, filters)

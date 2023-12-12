@@ -12,18 +12,18 @@ g:
       #     code:
       #       within: [AUS, ANC, MCO]
       traversals: # _and, _or, _not
-        # by_count: # _and, _or, _not
-        #   filters: # _and, _or, _not
-        #     outE:
-        #       labels:
-        #         - route
-        #       properties: # _and, _or, _not
-        #         _or:
-        #           dist:
-        #             gte: 10 
-        #   conditions:
-        #   - gte : 2
-        #   - lte: 5
+        by_count: # _and, _or, _not
+          filters: # _and, _or, _not
+            outE:
+              labels:
+                - route
+              properties: # _and, _or, _not
+                _or:
+                  dist:
+                    gte: 10 
+          conditions:
+          - gte : 2
+          - lte: 5
         by_filters: # this is filter by edges  # _and, _or, _not 
           outE:
             labels:
